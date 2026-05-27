@@ -52,11 +52,7 @@ const GameController = {
   },
 
   checkDraw(){
-    if (!Gameboard.board.some((slot) => slot === "")) {
-        return true;
-    }else{
-        return false;
-      }
+    return !Gameboard.board.some((slot) => slot === "")
   },
  
   checkWinner() {
@@ -74,11 +70,9 @@ const GameController = {
       for (const line of winningLines) {
         const [a, b, c] = line;
 
-        if(Gameboard.board[a] !== "" && Gameboard.board[b] !== "" && Gameboard.board[c] !== ""){
-          if (Gameboard.board[a] === Gameboard.board[b] && Gameboard.board[b] === Gameboard.board[c]) {
+          if (Gameboard.board[a] !== "" && Gameboard.board[a] === Gameboard.board[b] && Gameboard.board[b] === Gameboard.board[c]) {
           return Gameboard.board[a];
           }
-        }
         
       }
       if(this.checkDraw()){
