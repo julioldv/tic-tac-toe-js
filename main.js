@@ -88,20 +88,18 @@ const GameController = (()=>{
 
   const playRound = (slotNumber)=>{
     if(winner !== null){
-      console.log("The game is already over");
-      return;
+      return "The game is already over";
     }
     if(!Gameboard.placeMarker(slotNumber,currentPlayer.marker)){
-      return;
+      return "Slot is already taken";
     }
     Gameboard.printBoard();
     winner = checkWinner();
     if(winner === currentPlayer.marker){
-      console.log(`${currentPlayer.name} (${currentPlayer.marker}) WINS!`);
+      return `${currentPlayer.name} (${currentPlayer.marker}) WINS!`;
       return;
     }else if(winner === "draw"){
-      console.log("It is a DRAW");
-      return;
+      return "It is a DRAW";
     }
     switchPlayer();
   };
@@ -124,3 +122,30 @@ const GameController = (()=>{
 
   return {getCurrentPlayer, getWinner, playRound, startGame};
 })();
+
+const DisplayController = (()=>{
+  const cellsContainer = document.querySelector(".cells-container");
+  const messageArea = document.querySelector(".message-area");
+
+  const renderBoard = () =>{
+    cellsContainer.innerHTML = "";
+    const board = Gameboard.getBoard();
+
+    board.forEach((element,index) => {
+      const button = document.createElement("button");
+      button.textContent = element;
+      button.addEventListener("click",(event)=>{
+        const slotNumber = index + 1;
+        //GameController.playRound(slotNumber);
+        messageArea.textContent = GameController.playRound(slotNumber);
+        renderBoard();
+      });
+      cellsContainer.appendChild(button);
+    });
+  }
+
+  return {renderBoard};
+})();
+
+Gameboard.initializeBoard();
+DisplayController.renderBoard();

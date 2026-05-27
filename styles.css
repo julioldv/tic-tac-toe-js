@@ -2,3 +2,11 @@ body{
     text-align: center;
 }
 
+.cells-container{
+    display: grid;
+    grid-template: repeat(3, 1fr) / repeat(3,1fr);
+}
+
+.cells-container button{
+    height: 50px;
+}
