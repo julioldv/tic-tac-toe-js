@@ -1,61 +1,66 @@
-const Gameboard = {
-  board : [],
+const Gameboard = (() => {
+  let board = [];
 
-  initializeBoard(){
+  const getBoard = () => [...board];
+
+  const initializeBoard = () => {
     for (let i = 0; i < 9; i++) {
-    this.board[i] = "";
-}
-  },
-
-  printBoard(){
-      console.log("|---|---|---|");
-      console.log(`| ${this.board[0]} | ${this.board[1]} | ${this.board[2]} |`);
-      console.log("|-----------|");
-      console.log(`| ${this.board[3]} | ${this.board[4]} | ${this.board[5]} |`);
-      console.log("|-----------|");
-      console.log(`| ${this.board[6]} | ${this.board[7]} | ${this.board[8]} |`);
-      console.log("|---|---|---|");
-  },
-
-  isSlotAvailable(slotNumber){
-    return this.board[slotNumber - 1] === "";
-  },
-
-  placeMarker(slotNumber, marker){
-    if (this.isSlotAvailable(slotNumber)) {
-      this.board[slotNumber - 1] = marker;
-      return true;
-    } else {
-      return false;
+      board[i] = "";
     }
-  }
+  };
 
+  const printBoard = () => {
+    console.log("|---|---|---|");
+    console.log(`| ${board[0]} | ${board[1]} | ${board[2]} |`);
+    console.log("|-----------|");
+    console.log(`| ${board[3]} | ${board[4]} | ${board[5]} |`);
+    console.log("|-----------|");
+    console.log(`| ${board[6]} | ${board[7]} | ${board[8]} |`);
+    console.log("|---|---|---|");
+  };
+
+  const isSlotAvailable = (slotNumber) => {
+    return board[slotNumber - 1] === "";
+  };
+
+  const placeMarker = (slotNumber, marker) => {
+    if (isSlotAvailable(slotNumber)) {
+      board[slotNumber - 1] = marker;
+      return true;
+    }
+
+    return false;
+  };
+
+  return {getBoard, initializeBoard, printBoard, isSlotAvailable, placeMarker };
+})();
+
+function createPlayer(name,marker){
+  return {name,marker};
 }
 
+const player1 = createPlayer("Player 1", "X");
+const player2 = createPlayer("Player 2", "O");
 
-const player1 = {
-  name: "Player 1",
-  marker : "X"
-}
 
-const player2 = {
-  name: "Player 2",
-  marker: "O"
-}
+const GameController = (()=>{
 
-const GameController = {
-  currentPlayer: player1,
-  winner : null,
+  let currentPlayer = player1;
+  let winner = null;
 
-  switchPlayer(){
-    this.currentPlayer = this.currentPlayer === player1 ? player2 : player1; 
-  },
+  const getCurrentPlayer = () => ({...currentPlayer});
+  const getWinner = () => winner;
 
-  checkDraw(){
-    return !Gameboard.board.some((slot) => slot === "")
-  },
- 
-  checkWinner() {
+  const switchPlayer = () =>{
+    currentPlayer = currentPlayer === player1 ? player2 : player1; 
+  };
+
+  const checkDraw = () =>{
+    return !Gameboard.getBoard().some((slot) => slot === "");
+  };
+
+  const checkWinner = ()=>{
+      const board = Gameboard.getBoard();
       const winningLines = [
         [0, 1, 2],
         [3, 4, 5],
@@ -70,54 +75,54 @@ const GameController = {
       for (const line of winningLines) {
         const [a, b, c] = line;
 
-          if (Gameboard.board[a] !== "" && Gameboard.board[a] === Gameboard.board[b] && Gameboard.board[b] === Gameboard.board[c]) {
-          return Gameboard.board[a];
+          if (board[a] !== "" && board[a] === board[b] && board[b] === board[c]) {
+          return board[a];
           }
         
       }
-      if(this.checkDraw()){
+      if(checkDraw()){
         return "draw";
       }
       return null;
-  },
+  };
 
-  playRound(slotNumber){
-    if(this.winner !== null){
+  const playRound = (slotNumber)=>{
+    if(winner !== null){
       console.log("The game is already over");
       return;
     }
-    if(!Gameboard.placeMarker(slotNumber,this.currentPlayer.marker)){
+    if(!Gameboard.placeMarker(slotNumber,currentPlayer.marker)){
       return;
     }
     Gameboard.printBoard();
-    this.winner = this.checkWinner();
-    if(this.winner === this.currentPlayer.marker){
-      console.log(`${this.currentPlayer.name} (${this.currentPlayer.marker}) WINS!`);
+    winner = checkWinner();
+    if(winner === currentPlayer.marker){
+      console.log(`${currentPlayer.name} (${currentPlayer.marker}) WINS!`);
       return;
-    }else if(this.winner === "draw"){
+    }else if(winner === "draw"){
       console.log("It is a DRAW");
       return;
     }
-    this.switchPlayer();
-  },
+    switchPlayer();
+  };
 
-  startGame(){
-    this.currentPlayer = player1;
-    this.winner = null;
+  const startGame = () =>{
+    currentPlayer = player1;
+    winner = null;
     Gameboard.initializeBoard();
     Gameboard.printBoard();
 
-    while(this.winner === null){
-      const input = prompt(`${this.currentPlayer.name}'s turn. Enter a slot number to place ${this.currentPlayer.marker} in:`);
+    while(winner === null){
+      const input = prompt(`${currentPlayer.name}'s turn. Enter a slot number to place ${currentPlayer.marker} in:`);
       const numInput = Number(input);
       if (!Number.isInteger(numInput) || numInput < 1 || numInput > 9) {
         continue;
       }
-      this.playRound(numInput);
+      playRound(numInput);
     }
   }
 
-}
-
+  return {getCurrentPlayer, getWinner, playRound, startGame};
+})();
 
 GameController.startGame();
