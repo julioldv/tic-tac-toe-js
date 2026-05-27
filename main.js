@@ -124,5 +124,3 @@ const GameController = (()=>{
 
   return {getCurrentPlayer, getWinner, playRound, startGame};
 })();
-
-GameController.startGame();
