@@ -5,8 +5,12 @@ body{
 .cells-container{
     display: grid;
     grid-template: repeat(3, 1fr) / repeat(3,1fr);
+    gap: 5px;
 }
 
-.cells-container button{
+.cell-button{
     height: 50px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }

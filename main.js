@@ -9,16 +9,6 @@ const Gameboard = (() => {
     }
   };
 
-  const printBoard = () => {
-    console.log("|---|---|---|");
-    console.log(`| ${board[0]} | ${board[1]} | ${board[2]} |`);
-    console.log("|-----------|");
-    console.log(`| ${board[3]} | ${board[4]} | ${board[5]} |`);
-    console.log("|-----------|");
-    console.log(`| ${board[6]} | ${board[7]} | ${board[8]} |`);
-    console.log("|---|---|---|");
-  };
-
   const isSlotAvailable = (slotNumber) => {
     return board[slotNumber - 1] === "";
   };
@@ -32,7 +22,7 @@ const Gameboard = (() => {
     return false;
   };
 
-  return {getBoard, initializeBoard, printBoard, isSlotAvailable, placeMarker };
+  return {getBoard, initializeBoard, isSlotAvailable, placeMarker };
 })();
 
 function createPlayer(name,marker){
@@ -93,22 +83,20 @@ const GameController = (()=>{
     if(!Gameboard.placeMarker(slotNumber,currentPlayer.marker)){
       return "Slot is already taken";
     }
-    Gameboard.printBoard();
     winner = checkWinner();
-    if(winner === currentPlayer.marker){
-      return `${currentPlayer.name} (${currentPlayer.marker}) WINS!`;
-      return;
-    }else if(winner === "draw"){
-      return "It is a DRAW";
+
+    if(winner !== null){
+      return null;
     }
+
     switchPlayer();
+    return null;
   };
 
   const startGame = () =>{
     currentPlayer = player1;
     winner = null;
     Gameboard.initializeBoard();
-    Gameboard.printBoard();
 
     while(winner === null){
       const input = prompt(`${currentPlayer.name}'s turn. Enter a slot number to place ${currentPlayer.marker} in:`);
@@ -133,19 +121,37 @@ const DisplayController = (()=>{
 
     board.forEach((element,index) => {
       const button = document.createElement("button");
+      button.classList.add("cell-button");
       button.textContent = element;
       button.addEventListener("click",(event)=>{
         const slotNumber = index + 1;
-        //GameController.playRound(slotNumber);
-        messageArea.textContent = GameController.playRound(slotNumber);
+        const result = GameController.playRound(slotNumber);
         renderBoard();
+        if(result !== null){
+          messageArea.textContent = result;
+        }else{
+          renderMessage();
+        }
       });
       cellsContainer.appendChild(button);
     });
   }
 
-  return {renderBoard};
+  const renderMessage = () =>{
+    const winner = GameController.getWinner();
+    const currentPlayer = GameController.getCurrentPlayer();
+    if(winner === "X" || winner === "O" ){
+      messageArea.textContent = `${currentPlayer.name} (${currentPlayer.marker}) WINS`;
+    }else if(winner === "draw"){
+      messageArea.textContent = "It's a DRAW";
+    }else{
+      messageArea.textContent = `${currentPlayer.name}'s (${currentPlayer.marker}) turn`;
+    }
+  }
+
+  return {renderMessage,renderBoard};
 })();
 
 Gameboard.initializeBoard();
 DisplayController.renderBoard();
+DisplayController.renderMessage();
